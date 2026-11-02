@@ -1,0 +1,31 @@
+{
+  "id": "ask-research",
+  "name": "Ask Research",
+  "description": "Gives an agent one tool, ask_research, to put a single question to the research agent and get its answer back verbatim.",
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "ask_research"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "agentId": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
+        "default": "research",
+        "description": "Id of the agent that answers. An invalid value falls back to research."
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 1,
+        "default": 600000,
+        "description": "How long to wait for the answer, in milliseconds. An invalid value falls back to 600000."
+      }
+    }
+  }
+}
