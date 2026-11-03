@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Rules for working in this repo. Git and pull request flow follows the shared [CONTRIBUTING.md](https://github.com/seriouslysean/.github/blob/main/CONTRIBUTING.md); this file states only what differs.
+Rules for working in this repo. Git and pull request flow follows the shared [CONTRIBUTING.md](https://github.com/splitleafhq/.github/blob/main/CONTRIBUTING.md); this file states only what differs.
 
 Install `npm ci --ignore-scripts`. Before a pull request run `scripts/check` (lint, typecheck, test, build, as CI does). Source is `src/`, tests `test/`, the committed build `dist/`, details `docs/`.
 
