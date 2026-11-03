@@ -2,7 +2,7 @@
 
 Rules for working in this repo. Git and pull request flow follows the shared [CONTRIBUTING.md](https://github.com/splitleafhq/.github/blob/main/CONTRIBUTING.md); this file states only what differs.
 
-Install `npm ci --ignore-scripts`. Before a pull request run `scripts/check` (lint, typecheck, test, build, as CI does). Source is `src/`, tests `test/`, the committed build `dist/`, details `docs/`.
+Install `npm ci --ignore-scripts`. Before a pull request run `scripts/check` (lint, typecheck, test, build and a current `dist/`, as CI does); `git config core.hooksPath .githooks` once per clone runs it on every push. Source is `src/`, tests `test/`, the committed build `dist/`, details `docs/`.
 
 1. Give an agent one tool, `ask_research`: one self-contained question to one target agent, its last assistant text back verbatim. No other tools, hooks, retries or answer rewriting.
 2. Hard-code no setup detail: the target agent id (`agentId`, default `research`) and the wait (`timeoutMs`, default 600000) come from config.
