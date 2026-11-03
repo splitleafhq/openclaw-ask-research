@@ -18,13 +18,13 @@
         "type": "string",
         "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$",
         "default": "research",
-        "description": "Id of the agent that answers. An invalid value falls back to research."
+        "description": "Id of the agent that answers."
       },
       "timeoutMs": {
         "type": "integer",
         "minimum": 1,
         "default": 600000,
-        "description": "How long to wait for the answer, in milliseconds. An invalid value falls back to 600000."
+        "description": "How long to wait for the answer, in milliseconds."
       }
     }
   }

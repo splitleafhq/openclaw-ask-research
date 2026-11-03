@@ -18,9 +18,9 @@
 - This TypeScript build, loaded from `dist/`: `plugins inspect ask-research --runtime --json` reporting `status: loaded` and the tool, and a git install with `dist/` committed (handoff-guard's equivalent check is in its own verification notes).
 - The tests use a fake `subagent` runtime. The real `getSessionMessages` message shape (a string or a list of parts with `type: "text"`) is assumed from the spike and the SDK type `unknown[]`, not documented.
 - The `limit: 20` window: a long answer run with many tool calls might leave the last text message outside it.
-- `waitForRun` with the `timeoutMs` set: that a run still going when it elapses reports `timeout` and keeps running, or is stopped, is not checked.
+- `waitForRun` with the `timeoutMs` set: that a run still going when it elapses reports `timeout` and keeps running is not checked live; docs/plugins/sdk-runtime/background-work.md says the timeout bounds the wait, so the answer says the run may still be going.
 - Sessions are left behind: one `agent:<agentId>:subagent:ask-<uuid>` session per call is never deleted, and what the host does with them is not checked.
-- Config validation: whether the host rejects an `agentId` or `timeoutMs` that breaks the manifest schema, or passes it to the plugin.
+- Config validation: from the OpenClaw 2026.10.8 plugin loader source, the host rejects config that breaks the manifest schema before registering the plugin; not seen in a running gateway.
 - Other versions: nothing below 2026.10.8 was tried; `peerDependencies` and `compat` say `>=2026.10.8`.
 - Failure texts as the calling agent sees them.
 

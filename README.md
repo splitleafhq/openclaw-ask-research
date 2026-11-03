@@ -28,7 +28,7 @@ At `plugins.entries.ask-research.config`; both keys are optional.
 | `agentId` | `research` | Id of the agent that answers |
 | `timeoutMs` | `600000` | How long to wait for the answer |
 
-An invalid value falls back to its default.
+OpenClaw rejects an invalid value when it loads the plugin. A timeout ends the wait, not the run: the answer says so and names the session.
 
 ## Docs
 

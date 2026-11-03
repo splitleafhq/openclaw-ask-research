@@ -61,6 +61,9 @@ export async function askResearch(subagent: SubagentRuntime, config: AskConfig, 
   const sessionKey = `agent:${config.agentId}:subagent:ask-${randomUUID()}`;
   const { runId } = await subagent.run({ sessionKey, message: question, deliver: false });
   const result = await subagent.waitForRun({ runId, timeoutMs: config.timeoutMs });
+  if (result.status === 'timeout') {
+    return `${config.agentId} did not finish in time and may still be running in session ${sessionKey}; asking again repeats the work`;
+  }
   if (result.status !== 'ok') {
     return `${config.agentId} did not finish: ${result.status}${result.error ? ` ${result.error}` : ''}`;
   }

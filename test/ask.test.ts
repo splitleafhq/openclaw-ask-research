@@ -86,14 +86,14 @@ test('no assistant text returns a clear line instead of an empty answer', async 
 
 test('a run slower than the configured timeout reports the timeout, and a longer timeout waits for it', async () => {
   const slow = fakeAgent({ transcript: [{ role: 'assistant', content: reply }], durationMs: 5000 });
-  assert.equal(await askResearch(slow.runtime, readConfig({ timeoutMs: 1000 }), 'q'), 'research did not finish: timeout');
+  assert.match(await askResearch(slow.runtime, readConfig({ timeoutMs: 1000 }), 'q'), /^research did not finish in time and may still be running in session agent:research:subagent:ask-/);
   assert.equal(await askResearch(slow.runtime, readConfig({ timeoutMs: 6000 }), 'q'), reply);
 });
 
 test('the default timeout is 600000 ms', async () => {
   assert.equal(DEFAULT_TIMEOUT_MS, 600_000);
   const slow = fakeAgent({ transcript: [{ role: 'assistant', content: reply }], durationMs: 600_001 });
-  assert.equal(await askResearch(slow.runtime, config, 'q'), 'research did not finish: timeout');
+  assert.match(await askResearch(slow.runtime, config, 'q'), /^research did not finish in time/);
   const fits = fakeAgent({ transcript: [{ role: 'assistant', content: reply }], durationMs: 600_000 });
   assert.equal(await askResearch(fits.runtime, config, 'q'), reply);
 });
