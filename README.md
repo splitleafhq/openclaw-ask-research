@@ -8,6 +8,7 @@ An [OpenClaw](https://docs.openclaw.ai) plugin (id `ask-research`) that gives an
 
 ```sh
 npm ci --ignore-scripts
+git config core.hooksPath .githooks   # once per clone: scripts/check runs on every push
 scripts/check
 ```
 
