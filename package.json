@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "24.19.2",
-    "openclaw": "2026.10.8",
+    "openclaw": "2026.11.2",
     "oxlint": "1.88.0",
     "typescript": "7.0.2"
   },
@@ -49,5 +49,8 @@
     "dist/",
     "src/",
     "openclaw.plugin.json"
-  ]
+  ],
+  "overrides": {
+    "npm": "12.2.2"
+  }
 }
