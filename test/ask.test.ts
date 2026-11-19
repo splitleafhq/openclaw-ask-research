@@ -110,7 +110,8 @@ test('a timeout names the session that was run, and it belongs to the configured
   const text = await askResearch(slow.runtime, readConfig({ agentId: 'scholar', timeoutMs: 1000 }), 'q');
   const [sessionKey] = slow.sessionKeys;
   assert.equal(slow.sessionKeys.length, 1);
-  assert.ok(sessionKey?.startsWith('agent:scholar:'));
+  // The documented key format: a fresh sub-agent session of the configured agent for each question.
+  assert.match(sessionKey ?? '', /^agent:scholar:subagent:ask-[0-9a-f-]{36}$/);
   assert.equal(text.match(/agent:[^\s;]+/)?.[0], sessionKey);
 });
 

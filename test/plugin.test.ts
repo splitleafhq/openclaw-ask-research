@@ -53,7 +53,8 @@ test('the tool returns the answer as text content and sends the question unchang
   const result = await tools[0]?.tool.execute('call-1', { question: 'What is sparse attention?' });
   assert.deepEqual(result?.content, [{ type: 'text', text: 'The answer.' }]);
   assert.equal(runs[0]?.message, 'What is sparse attention?');
-  assert.match(runs[0]?.sessionKey ?? '', /^agent:scholar:/);
+  // The documented key format; the host reads the `subagent:` part to treat the run as a sub-agent's.
+  assert.match(runs[0]?.sessionKey ?? '', /^agent:scholar:subagent:ask-[0-9a-f-]{36}$/);
 });
 
 test('a missing or blank question asks for one and starts no run', async () => {
