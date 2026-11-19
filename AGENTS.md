@@ -15,5 +15,5 @@ Install `npm ci --ignore-scripts`. Before a pull request run `scripts/check` (li
 9. Commit `dist/` after `npm run build`: OpenClaw installs run npm without scripts, so it is what runs. CI fails when it is stale.
 10. A comment states a constraint the code can't show, never what the next line does.
 11. Write terse, factual prose.
-12. Commit, push and open pull requests on the user's behalf; merging, tagging and releasing each need their own approval. Cut no release or tag without it.
+12. Commit, push and open pull requests on the user's behalf; merging, tagging and releasing each need their own approval. Dependabot pull requests are the exception: CI's `automerge` job squash-merges a patch or minor update once every check passes; a major waits for approval. Cut no release or tag without it.
 13. Keep agent-session links and session trailers out of commit messages, issues and pull request bodies.
