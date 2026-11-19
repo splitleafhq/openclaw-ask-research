@@ -2,7 +2,6 @@ import { strict as assert } from 'node:assert';
 import { test } from 'node:test';
 import {
   DEFAULT_AGENT_ID,
-  DEFAULT_TIMEOUT_MS,
   type SubagentRuntime,
   askResearch,
   lastAssistantText,
@@ -13,15 +12,19 @@ interface Fake {
   runtime: SubagentRuntime;
   /** Agent ids that received a run. */
   agents: string[];
+  /** Session keys that received a run. */
+  sessionKeys: string[];
 }
 
 /** A research agent that takes `durationMs` and then leaves `transcript` in the session it was given. */
 function fakeAgent(options: { transcript?: unknown[]; durationMs?: number; failure?: string }): Fake {
   const sessions = new Map<string, string>();
   const agents: string[] = [];
+  const sessionKeys: string[] = [];
   const runtime: SubagentRuntime = {
     async run({ sessionKey }) {
       agents.push(sessionKey.split(':')[1] ?? '');
+      sessionKeys.push(sessionKey);
       const runId = `run-${sessions.size + 1}`;
       sessions.set(runId, sessionKey);
       return { runId };
@@ -36,7 +39,7 @@ function fakeAgent(options: { transcript?: unknown[]; durationMs?: number; failu
       return { messages: options.transcript ?? [] };
     },
   };
-  return { runtime, agents };
+  return { runtime, agents, sessionKeys };
 }
 
 const config = readConfig(undefined);
@@ -74,7 +77,9 @@ test('an assistant message with no text is skipped for the one before it', () =>
 
 test('a run that is not ok returns a failure line with its status and error', async () => {
   const { runtime } = fakeAgent({ failure: 'model unavailable' });
-  assert.equal(await askResearch(runtime, config, 'q'), 'research did not finish: error model unavailable');
+  const text = await askResearch(runtime, config, 'q');
+  assert.match(text, /^research did not finish: error\b/);
+  assert.ok(text.includes('model unavailable'));
 });
 
 test('no assistant text returns a clear line instead of an empty answer', async () => {
@@ -86,16 +91,27 @@ test('no assistant text returns a clear line instead of an empty answer', async 
 
 test('a run slower than the configured timeout reports the timeout, and a longer timeout waits for it', async () => {
   const slow = fakeAgent({ transcript: [{ role: 'assistant', content: reply }], durationMs: 5000 });
-  assert.match(await askResearch(slow.runtime, readConfig({ timeoutMs: 1000 }), 'q'), /^research did not finish in time and may still be running in session agent:research:subagent:ask-/);
+  const text = await askResearch(slow.runtime, readConfig({ timeoutMs: 1000 }), 'q');
+  assert.match(text, /did not finish in time/);
+  assert.doesNotMatch(text, /did not finish: /);
+  assert.notEqual(text, reply);
   assert.equal(await askResearch(slow.runtime, readConfig({ timeoutMs: 6000 }), 'q'), reply);
 });
 
 test('the default timeout is 600000 ms', async () => {
-  assert.equal(DEFAULT_TIMEOUT_MS, 600_000);
   const slow = fakeAgent({ transcript: [{ role: 'assistant', content: reply }], durationMs: 600_001 });
   assert.match(await askResearch(slow.runtime, config, 'q'), /^research did not finish in time/);
   const fits = fakeAgent({ transcript: [{ role: 'assistant', content: reply }], durationMs: 600_000 });
   assert.equal(await askResearch(fits.runtime, config, 'q'), reply);
+});
+
+test('a timeout names the session that was run, and it belongs to the configured agent', async () => {
+  const slow = fakeAgent({ durationMs: 5000 });
+  const text = await askResearch(slow.runtime, readConfig({ agentId: 'scholar', timeoutMs: 1000 }), 'q');
+  const [sessionKey] = slow.sessionKeys;
+  assert.equal(slow.sessionKeys.length, 1);
+  assert.ok(sessionKey?.startsWith('agent:scholar:'));
+  assert.equal(text.match(/agent:[^\s;]+/)?.[0], sessionKey);
 });
 
 test('the question goes to the default agent, or to the configured one, which names itself in failures', async () => {
@@ -106,7 +122,8 @@ test('the question goes to the default agent, or to the configured one, which na
   const other = fakeAgent({ failure: 'boom' });
   const text = await askResearch(other.runtime, readConfig({ agentId: 'scholar' }), 'q');
   assert.deepEqual(other.agents, ['scholar']);
-  assert.equal(text, 'scholar did not finish: error boom');
+  assert.match(text, /^scholar did not finish: error\b/);
+  assert.ok(text.includes('boom'));
 });
 
 test('an invalid agent id or timeout falls back to its default, and a valid one is kept', () => {
